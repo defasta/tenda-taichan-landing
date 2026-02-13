@@ -107,7 +107,7 @@ const TendaTaichan = () => {
 <div className="space-y-4">
   {/* Opsi 1: GoFood (Warna Hijau) */}
   <a 
-    href="https://gofood.link/a/toko-kamu" // Ganti link GoFood kamu
+    href="https://gofood.co.id/semarang/restaurant/tenda-taichan-salatiga-7054185a-b9fc-4647-9f67-8428514a77c7" // Ganti link GoFood kamu
     target="_blank" 
     rel="noopener noreferrer"
     className="w-full bg-[#00AA13] text-white py-4 px-6 rounded-xl font-black flex items-center justify-center gap-3 
