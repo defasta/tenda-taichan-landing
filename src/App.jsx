@@ -29,62 +29,50 @@ const TendaTaichan = () => {
         </div>
       </nav>
 
-  {/* Hero Section */}
-    {/* Hero Section */}
-      <section className="relative h-[100dvh] w-full flex items-center justify-center overflow-hidden">
-        
-        {/* BACKGROUND IMAGE (Layer Paling Belakang) */}
+      {/* Hero Section */}
+      <section className="relative h-[100dvh] flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 bg-black/40 z-10" />
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1 }}
           className="absolute inset-0 z-0"
         >
-          <img 
-            src={bgmain} 
-            alt="Sate Taichan Juara" 
-            className="w-full h-full object-cover"
-          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent z-10" />
+          {/* Ganti URL image dengan foto Sate Taichan andalanmu */}
+<img 
+  src={bgmain} 
+  alt="Sate Taichan Juara" 
+  className="w-full h-full object-cover"
+/>
         </motion.div>
 
-        {/* GRADASI HALUS (Layer Tengah) */}
-        {/* Penjelasan Teknik:
-            1. inset-0: Gradasi menutupi seluruh gambar.
-            2. from-[#0a0a0a] from-5%: 5% terbawah layar adalah hitam SOLID (agar nyambung sempurna dengan section bawah).
-            3. via-black/60 via-40%: Sampai 40% layar, warnanya hitam transparan 60% (membuat tulisan terbaca).
-            4. to-transparent: Sisanya ke atas bening agar gambar terlihat.
-        */}
-        <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#0a0a0a] from-5% via-[#0a0a0a]/60 via-40% to-transparent" />
-
-        {/* KONTEN TEKS (Layer Paling Depan) */}
-        <div className="relative z-20 text-center px-4 mt-10 w-full max-w-4xl mx-auto">
+        <div className="relative z-20 text-center px-4">
           <motion.span 
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="text-red-500 font-bold tracking-[0.3em] uppercase text-xs md:text-sm mb-4 block drop-shadow-md"
+            className="text-red-600 font-bold tracking-[0.3em] uppercase text-sm mb-4 block"
           >
-            PEDAS • SEGAR • NAGIH
+            Pedas, Segar, Nagih!.
           </motion.span>
-          
           <motion.h1 
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="text-5xl md:text-8xl font-serif font-bold mb-8 italic leading-tight drop-shadow-lg"
+            transition={{ delay: 0.3 }}
+            className="text-6xl md:text-8xl font-serif font-bold mb-6 italic"
           >
             Sate <span className="text-white not-italic">Taichan</span>
           </motion.h1>
-          
-          <motion.button 
+  <motion.button 
             whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
             onClick={() => setShowMenu(true)} 
-            className="bg-red-600 text-white px-8 py-3 md:px-10 md:py-4 rounded-full font-bold tracking-wider hover:bg-red-700 transition-all shadow-[0_0_30px_rgba(220,38,38,0.5)] border border-red-500/50"
+            className="bg-red-600 text-white px-10 py-4 rounded-full font-bold tracking-wide hover:bg-red-700 transition shadow-2xl shadow-red-600/20"
           >
             LIHAT MENU
           </motion.button>
         </div>
       </section>
+
       {/* Featured Menu / Promotion */}
       <section id="menu" className="py-32 px-10 max-w-6xl mx-auto">
         <div className="grid md:grid-cols-2 gap-20 items-center">
