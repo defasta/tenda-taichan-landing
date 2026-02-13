@@ -30,14 +30,15 @@ const TendaTaichan = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative h-[90vh] flex items-center justify-center overflow-hidden">
+      <section className="relative h-[100dvh] flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 bg-black/40 z-10" />
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1 }}
           className="absolute inset-0 z-0"
         >
-          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-[#0a0a0a] z-10" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent z-10" />
           {/* Ganti URL image dengan foto Sate Taichan andalanmu */}
 <img 
   src={bgmain} 
