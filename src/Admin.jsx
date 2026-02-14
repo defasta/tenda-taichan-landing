@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import { 
   Trash2, LogOut, Save, Image as ImageIcon, Loader2, Star, Flame, 
-  ShoppingBag, MessageCircle, MapPin, ArrowRight, Utensils, Phone, Plus, X
+  ShoppingBag, MessageCircle, MapPin, ArrowRight, Utensils, Phone, Plus, X, Lock, Mail
 } from 'lucide-react';
 
 const ICON_LIST = [
@@ -16,21 +16,20 @@ const AdminPage = ({ onBack }) => {
   const [session, setSession] = useState(null);
   const [activeTab, setActiveTab] = useState('menu'); 
   
+  // LOGIN STATE
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loginLoading, setLoginLoading] = useState(false);
+
   // STATE MENU
   const [menu, setMenu] = useState([]);
-  const [categories, setCategories] = useState(["Sate Taichan", "Taichan Naga", "Menu Paket", "Minuman", "Lainnya"]); // Default
-  const [isManualCategory, setIsManualCategory] = useState(false); // Toggle input manual
+  const [categories, setCategories] = useState(["Sate Taichan", "Taichan Naga", "Menu Paket", "Minuman", "Lainnya"]); 
+  const [isManualCategory, setIsManualCategory] = useState(false); 
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   
   const [menuForm, setMenuForm] = useState({ 
-    name: '', 
-    price: '', 
-    category: 'Sate Taichan', 
-    desc_text: '', 
-    image_url: '', 
-    rating: '5.0', 
-    is_spicy: false 
+    name: '', price: '', category: 'Sate Taichan', desc_text: '', image_url: '', rating: '5.0', is_spicy: false 
   });
   const [editingMenuId, setEditingMenuId] = useState(null);
 
@@ -44,20 +43,47 @@ const AdminPage = ({ onBack }) => {
   const [heroId, setHeroId] = useState(null);
 
   useEffect(() => {
+    // Cek Session saat load
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session) { fetchMenu(); fetchHero(); }
     });
+
+    // Listener jika auth berubah (login/logout)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (session) { fetchMenu(); fetchHero(); }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
+  // --- FUNGSI LOGIN ---
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoginLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      setLoginLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    onBack(); // Kembali ke home setelah logout
+  };
+
+  // --- DATA FETCHING ---
   async function fetchMenu() {
     const { data } = await supabase.from('menu').select('*').order('id', { ascending: false });
     if (data) {
         setMenu(data);
-        // LOGIKA BARU: Ambil semua kategori unik dari database + default
         const existingCats = [...new Set(data.map(item => item.category))];
         const defaultCats = ["Sate Taichan", "Taichan Naga", "Menu Paket", "Minuman", "Lainnya"];
-        // Gabungkan dan hilangkan duplikat
         const mergedCats = [...new Set([...defaultCats, ...existingCats])];
         setCategories(mergedCats);
     }
@@ -94,22 +120,12 @@ const AdminPage = ({ onBack }) => {
   async function handleMenuSubmit(e) {
     e.preventDefault();
     setLoading(true);
-    
-    // Pastikan kategori tidak kosong
-    if(!menuForm.category.trim()) {
-        alert("Kategori harus diisi!");
-        setLoading(false);
-        return;
-    }
+    if(!menuForm.category.trim()) { alert("Kategori harus diisi!"); setLoading(false); return; }
 
     const query = supabase.from('menu');
     const { error } = editingMenuId ? await query.update(menuForm).eq('id', editingMenuId) : await query.insert([menuForm]);
     
-    if (!error) { 
-        alert("Menu Berhasil Disimpan!"); 
-        fetchMenu(); 
-        resetMenuForm(); 
-    }
+    if (!error) { alert("Menu Berhasil Disimpan!"); fetchMenu(); resetMenuForm(); }
     setLoading(false);
   }
   
@@ -144,8 +160,65 @@ const AdminPage = ({ onBack }) => {
     setHeroForm({...heroForm, [field]: newList});
   };
 
-  if (!session) return <div className="min-h-screen bg-black flex items-center justify-center text-white">Silakan Login Admin...</div>;
+  // === HALAMAN LOGIN (JIKA BELUM LOGIN) ===
+  if (!session) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-6 text-white font-sans">
+        <div className="w-full max-w-md bg-zinc-900/50 border border-white/10 p-8 rounded-2xl shadow-2xl backdrop-blur-md">
+           <div className="text-center mb-8">
+              <h1 className="text-3xl font-black tracking-tighter mb-2">TENDA<span className="text-red-600">TAICHAN.</span></h1>
+              <p className="text-gray-400 text-sm">Login untuk mengakses panel admin.</p>
+           </div>
+           
+           <form onSubmit={handleLogin} className="space-y-6">
+              <div className="space-y-2">
+                 <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Email</label>
+                 <div className="relative">
+                    <Mail className="absolute left-3 top-3 text-gray-500" size={20} />
+                    <input 
+                      type="email" 
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full bg-black border border-zinc-700 rounded-lg py-3 pl-10 pr-4 text-white focus:border-red-600 focus:outline-none transition"
+                      placeholder="admin@tendataichan.com"
+                    />
+                 </div>
+              </div>
+              
+              <div className="space-y-2">
+                 <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Password</label>
+                 <div className="relative">
+                    <Lock className="absolute left-3 top-3 text-gray-500" size={20} />
+                    <input 
+                      type="password" 
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full bg-black border border-zinc-700 rounded-lg py-3 pl-10 pr-4 text-white focus:border-red-600 focus:outline-none transition"
+                      placeholder="••••••••"
+                    />
+                 </div>
+              </div>
 
+              <button 
+                type="submit" 
+                disabled={loginLoading}
+                className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg shadow-lg shadow-red-900/20 transition flex items-center justify-center gap-2"
+              >
+                {loginLoading ? <Loader2 className="animate-spin" /> : "MASUK DASHBOARD"}
+              </button>
+           </form>
+
+           <button onClick={onBack} className="mt-6 w-full text-center text-xs text-zinc-500 hover:text-white transition">
+              &larr; Kembali ke Website Utama
+           </button>
+        </div>
+      </div>
+    );
+  }
+
+  // === DASHBOARD ADMIN (JIKA SUDAH LOGIN) ===
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white font-sans pb-24">
       {/* HEADER */}
@@ -157,7 +230,7 @@ const AdminPage = ({ onBack }) => {
           <div className="flex gap-2">
             <button onClick={() => setActiveTab('menu')} className={`px-4 py-2 rounded-lg text-sm transition ${activeTab==='menu'?'bg-red-600 text-white font-bold shadow-red-900/20':'text-gray-400 hover:text-white'}`}>Daftar Menu</button>
             <button onClick={() => setActiveTab('hero')} className={`px-4 py-2 rounded-lg text-sm transition ${activeTab==='hero'?'bg-red-600 text-white font-bold shadow-red-900/20':'text-gray-400 hover:text-white'}`}>Tampilan Depan</button>
-            <button onClick={onBack} className="px-3 py-2 border border-zinc-700 rounded-lg text-sm hover:bg-zinc-800 transition"><LogOut size={16}/></button>
+            <button onClick={handleLogout} className="px-3 py-2 border border-zinc-700 rounded-lg text-sm hover:bg-zinc-800 transition text-red-400" title="Logout"><LogOut size={16}/></button>
           </div>
       </div>
 
@@ -188,7 +261,6 @@ const AdminPage = ({ onBack }) => {
                                 <input value={menuForm.price} onChange={e => setMenuForm({...menuForm, price: e.target.value})} placeholder="Rp 15.000" className="w-full bg-black border border-zinc-700 p-3 rounded-lg text-white" required />
                              </div>
                              
-                             {/* UPDATED: KATEGORI DENGAN OPSI TAMBAH BARU */}
                              <div className="flex-1">
                                 <label className="text-xs text-gray-400 mb-1 block">Kategori</label>
                                 {isManualCategory ? (
@@ -317,7 +389,14 @@ const AdminPage = ({ onBack }) => {
                                    </div>
                                 </div>
                              </div>
-
+                             
+                             <div className="flex flex-col h-full">
+                                <label className="text-xs text-gray-400 block mb-1">Deskripsi Utama</label>
+                                <textarea value={heroForm.description} onChange={e=>setHeroForm({...heroForm, description: e.target.value})} className="bg-black border border-zinc-700 p-3 rounded-lg w-full text-sm flex-1 text-gray-300 resize-none min-h-[120px]" placeholder="Deskripsi Hero"/>
+                                <div className="mt-2 text-xs text-zinc-500 italic bg-zinc-900/50 p-2 rounded border border-white/5">
+                                    * Tombol di halaman utama sekarang otomatis mengarah ke <b>Halaman Menu</b>.
+                                </div>
+                             </div>
                         </div>
                     </div>
 

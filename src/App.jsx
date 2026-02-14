@@ -168,7 +168,7 @@ const TendaTaichan = () => {
           </div>
         </div>
         <div className="mt-20 pt-8 border-t border-white/5 text-center text-gray-600 text-sm flex justify-center gap-2">
-           <span>© 2026 Tenda Taichan.</span><button onClick={() => setView('admin')} className="hover:text-red-900 transition flex items-center gap-1"><span className="w-1 h-1 bg-red-900 rounded-full"></span> Dibuat dengan Bangga di Indonesia.</button>
+           <span>© 2026.</span><button onClick={() => setView('admin')} className="hover:text-red-900 transition flex items-center gap-1"><span className="w-1 h-1 bg-red-900 rounded-full"></span> Dibuat dengan Bangga di Indonesia.</button>
         </div>
       </footer>
     </div>
