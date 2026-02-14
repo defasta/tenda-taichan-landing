@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Instagram, Music2, MapPin, Phone, ShoppingBag, 
-  MessageCircle, Utensils, ArrowRight, Loader2 
+  MessageCircle, Utensils, ArrowRight, Loader2, ChevronDown 
 } from 'lucide-react';
 
 // Import Assets
@@ -41,7 +41,6 @@ const TendaTaichan = () => {
   // Logic khusus: Saat kembali dari Menu, cek apakah harus scroll ke promo
   const handleBackToPromo = () => {
     setView('home');
-    // Beri jeda sedikit agar halaman 'home' ter-render dulu, baru scroll
     setTimeout(() => {
       const section = document.getElementById('menu');
       if (section) section.scrollIntoView({ behavior: 'smooth' });
@@ -60,9 +59,7 @@ const TendaTaichan = () => {
           TENDA<span className="text-red-600">TAICHAN.</span>
         </motion.div>
         <div className="hidden md:flex gap-8 text-xs uppercase tracking-[0.2em] font-medium items-center">
-          {/* UBAH 1: Menu Utama scroll ke section #menu (Promo) */}
-          <a onClick={() => setView('menu')}className="hover:text-red-600 transition">Menu Kami</a>
-          
+          <a onClick={() => setView('menu')} className="cursor-pointer hover:text-red-600 transition">Menu Kami</a>
           <a href="#lokasi" className="hover:text-red-600 transition">Lokasi</a>
           <a href='#menu' className="hover:text-red-600 transition text-red-500 font-bold border border-red-600 px-4 py-2 rounded-full hover:bg-red-600 hover:text-white">Pesan Sekarang</a>
         </div>
@@ -87,7 +84,6 @@ const TendaTaichan = () => {
             {heroData?.description || "Nikmati sensasi pedas gurih Sate Taichan terbaik."}
           </motion.p>
           
-          {/* UBAH 2: Tombol Hero STATIS ke Halaman Menu (Settingan Admin diabaikan di tombol ini) */}
           <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.5 }}>
             <button 
                onClick={() => setView('menu')}
@@ -97,6 +93,20 @@ const TendaTaichan = () => {
             </button>
           </motion.div>
         </div>
+
+        {/* --- TAMBAHAN BARU: Scroll Down Indicator --- */}
+        <motion.a 
+          href="#menu"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1, y: [0, 10, 0] }} // Animasi naik turun
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 text-white/50 hover:text-white transition group cursor-pointer"
+        >
+            <span className="text-[10px] tracking-[0.3em] uppercase font-medium group-hover:text-red-500 transition">Menu Unggulan</span>
+            <ChevronDown size={24} className="group-hover:text-red-500 transition"/>
+        </motion.a>
+        {/* ------------------------------------------- */}
+
       </section>
 
       {/* FEATURED MENU / PROMO SECTION */}
